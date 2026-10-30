@@ -35,7 +35,7 @@ namespace PruebaTecnica.Mvc.Controllers
                 HttpContext.Session.SetString("UserRol", resultado.Rol);
                 HttpContext.Session.SetInt32("UserId", resultado.IdUsuario);
 
-                return RedirectToAction("Index", "Ventas");
+                return RedirectToAction("Index", "Home");
             }
 
             return View(model);

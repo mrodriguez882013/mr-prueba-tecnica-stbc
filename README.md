@@ -178,6 +178,39 @@ Documentación interactiva disponible con la API en ejecución en: 👉 **`https
 | GET | `/api/ventas/exportar-excel` | Descargar reporte corporativo en formato Excel (`.xlsx`) |
 | GET | `/api/ventas/exportar-pdf` | Descargar reporte corporativo en formato PDF (`.pdf`) |
 
+## 📸 Capturas de Pantalla del Sistema
+
+### 1. Autenticación y Seguridad
+* **Inicio de Sesión (Login)**
+  ![Login](docs/images/login.png)
+
+### 2. Panel Principal y Navegación
+* **Pantalla de Inicio (Home Enterprise)**
+  ![Pantalla Inicio](docs/images/pantalla%20inicio.png)
+
+### 3. Módulo de Gestión de Productos
+* **Catálogo de Productos**
+  ![Catálogo de Productos](docs/images/catálogo%20de%20productos.png)
+
+* **Formulario de Detalle / Edición**
+  ![Formulario Detalle Productos](docs/images/formulario%20detalle%20productos.png)
+
+* **Confirmación de Eliminación**
+  ![Confirmación Eliminación](docs/images/confirmación%20de%20eliminación.png)
+
+### 4. Módulo de Ventas
+* **Punto de Venta / Registro**
+  ![Ventas](docs/images/ventas.png)
+
+### 5. Módulo de Reportes y Exportación
+* **Vista General de Reportes**
+  ![Reportes](docs/images/reportes.png)
+
+* **Exportación a Excel**
+  ![Reporte Excel](docs/images/reporte%20excel.png)
+
+* **Exportación a PDF**
+  ![Reporte PDF](docs/images/reporte%20pdf.png)
 ---
 
 ## 👤 Autor
