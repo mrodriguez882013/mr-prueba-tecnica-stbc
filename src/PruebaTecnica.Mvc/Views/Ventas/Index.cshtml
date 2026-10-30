@@ -6,8 +6,8 @@
 
 <div class="container mt-4">
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">Registro de ventas</h5>
+        <div class="card-header bg-danger text-white" style="background-color: #b30000 !important;">
+            <h5 class="mb-0"><i class="bi bi-cart-plus me-2"></i>Registro de ventas</h5>
         </div>
         <div class="card-body">
             <div class="row g-3 align-items-end">
@@ -28,7 +28,9 @@
                     <input type="number" id="txtCantidad" class="form-control" value="1" min="1" />
                 </div>
                 <div class="col-md-1">
-                    <button type="button" id="btnAgregar" class="btn btn-danger w-100">+ agregar</button>
+                    <button type="button" id="btnAgregar" class="btn btn-danger w-100 fw-bold" style="background-color: #b30000; border-color: #b30000;">
+                        <i class="bi bi-plus-lg me-1"></i> Agregar
+                    </button>
                 </div>
             </div>
         </div>
@@ -36,10 +38,9 @@
 
     <div class="card shadow-sm border mb-4">
         <div class="card-body">
-            <h6 class="text-secondary mb-3">Detalle de ventas (Vendedor: <span class="fw-bold text-dark" id="lblVendedor">@vendedor</span>)</h6>
+            <h6 class="text-secondary mb-3"><i class="bi bi-list-check me-1"></i>Detalle de ventas (Vendedor: <span class="fw-bold text-dark" id="lblVendedor">@vendedor</span>)</h6>
         
             <table class="table table-bordered align-middle" id="tablaDetalle">
-                <!-- Encabezado con el tono gris exacto de la prueba -->
                 <thead style="background-color: #dcdcdc; color: #000;">
                     <tr>
                         <th style="width: 5%;">N°</th>
@@ -63,7 +64,10 @@
                     <p class="mb-1">Sub total: <strong id="lblSubTotal">0.00</strong></p>
                     <p class="mb-2">Total con IVA: <strong id="lblIva">0.00</strong></p>
                     <h5 class="text-dark mb-3">Total a pagar: <strong id="lblTotalPagar" class="text-danger">0.00</strong></h5>
-                    <button type="button" id="btnRegistrarVenta" class="btn btn-danger btn-lg w-100 fw-bold" style="background-color: #8b0000; border-color: #8b0000;">Registrar venta</button>
+                    <button type="button" id="btnRegistrarVenta" class="btn btn-danger btn-lg w-100 fw-bold"
+                            style="background-color: #8b0000; border-color: #8b0000;">
+                        <i class="bi bi-check-circle me-2"></i>Registrar venta
+                    </button>
                 </div>
             </div>
         </div>
@@ -81,20 +85,20 @@
             let codigo = $(this).val();
             if (!codigo) return;
             
-            // Apunta al método puente en el controlador MVC local
             $.get(`/Ventas/BuscarProductoPorCodigo?codigo=${codigo}`, function(data) {
                 let prod = Array.isArray(data) ? data[0] : data;
                 if (prod) {
                     $('#txtProducto').val(prod.producto || prod.productoNombre);
                     $('#txtPrecio').val(prod.precio);
                     $('#txtCodigo').data('idpro', prod.idPro || prod.idpro);
+                    Utilidades.mostrarNotificacion('Producto cargado correctamente.', '', 'info');
                 } else {
-                    alert('Producto no encontrado.');
+                    Utilidades.mostrarNotificacion('Producto no encontrado.', 'Atención', 'warning');
                     $('#txtProducto').val('');
                     $('#txtPrecio').val('');
                 }
             }).fail(function() {
-                alert('Error al conectar con el servidor para buscar el producto.');
+                Utilidades.mostrarNotificacion('Error al conectar con el servidor para buscar el producto.', 'Error', 'error');
             });
         });
 
@@ -107,12 +111,12 @@
             let cantidad = parseInt($('#txtCantidad').val());
 
             if (!idPro || !producto || isNaN(precio)) {
-                alert('Por favor, ingrese un código de producto válido.');
+                Utilidades.mostrarNotificacion('Por favor, ingrese un código de producto válido.', 'Atención', 'warning');
                 return;
             }
 
             if (!cantidad || cantidad <= 0) {
-                alert('La cantidad debe ser mayor a cero.');
+                Utilidades.mostrarNotificacion('La cantidad debe ser mayor a cero.', 'Atención', 'warning');
                 return;
             }
 
@@ -149,7 +153,7 @@
             detallesVenta.forEach((item, index) => {
                 subtotalGral += item.total;
 
-               let fechaHoy = new Date().toLocaleString('es-SV', {
+                let fechaHoy = new Date().toLocaleString('es-SV', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
@@ -157,17 +161,22 @@
                     minute: '2-digit',
                     hour12: true
                 });
+
                         tbody.append(`
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.codigo}</td>
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.codigo}</td>
                                 <td>${fechaHoy}</td>
-                                        <td>${item.productoNombre}</td>
+                                <td>${item.productoNombre}</td>
                                 <td>$${item.precio.toFixed(2)}</td>
                                 <td>${item.cantidad}</td>
-                                        <td>$${item.total.toFixed(2)}</td>
-                                <td class="text-center"><button class="btn btn-sm btn-outline-danger" onclick="quitarItem(${index})">🗑️</button></td>
-                            </tr>
+                                <td>$${item.total.toFixed(2)}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm text-danger border-0 bg-transparent p-0" onclick="quitarItem(${index})" title="Quitar">
+                                <i class="bi bi-trash-fill fs-5"></i>
+                                    </button>
+                        </td>
+                    </tr>
                         `);
             });
 
@@ -175,50 +184,50 @@
             let totalPagar = subtotalGral + ivaGral;
 
             $('#lblSubTotal').text('$' + subtotalGral.toFixed(2));
-                    $('#lblIva').text('$' + ivaGral.toFixed(2));
+            $('#lblIva').text('$' + ivaGral.toFixed(2));
             $('#lblTotalPagar').text('$' + totalPagar.toFixed(2));
         }
 
-              window.quitarItem = function(index) {
-                detallesVenta.splice(index, 1);
+        window.quitarItem = function(index) {
+            detallesVenta.splice(index, 1);
             renderizarTabla();
                 }
 
-                // Envío de la venta completa a la API a través del controlador MVC
-            $('#btnRegistrarVenta').click(function() {
-                if (detallesVenta.length === 0) {
-                alert('Debe agregar al menos un producto a la venta.');
+            // Envío de la venta completa utilizando SweetAlert2 de confirmación y Toastr con retraso
+                $('#btnRegistrarVenta').click(function() {
+            if (detallesVenta.length === 0) {
+                        Utilidades.mostrarNotificacion('Debe agregar al menos un producto a la venta.', 'Atención', 'warning');
                 return;
                     }
 
-                   let totalGeneral = parseFloat($('#lblTotalPagar').text().replace('$', ''));
+                Utilidades.confirmarAccion(
+                '¿Confirmar Venta?',
+                    'Se procederá a registrar la venta y descontar el inventario.',
+                    function() {
+                    let totalGeneral = parseFloat($('#lblTotalPagar').text().replace('$', ''));
 
-                 let payload = {
-                    vendedor: vendedor,
-                total: totalGeneral,
-                idUsuarioCreacion: idUsuario,
+                    let payload = {
+                        vendedor: vendedor,
+                        total: totalGeneral,
+                                idUsuarioCreacion: idUsuario,
                         detalles: detallesVenta.map(d => ({
-                    idPro: d.idPro,
-                    cantidad: d.cantidad,
-                    precio: d.precio,
-                    iva: d.iva,
-                    total: d.total
-                }))
+                            idPro: d.idPro,
+                            cantidad: d.cantidad,
+                            precio: d.precio,
+                            iva: d.iva,
+                            total: d.total
+                        }))
                     };
 
-                $.ajax({
-                url: '/Ventas/Registrar',
-                    type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(payload),
-                success: function(res) {
-                        alert('¡Venta registrada con éxito!');
+                    Utilidades.ejecutarAjax('/Ventas/Registrar', 'POST', payload, function(res) {
+                        Utilidades.mostrarAlertaModal('¡Venta Exitosa!', 'La venta ha sido registrada con éxito.', 'success');
+                        setTimeout(function() {
                             location.reload();
+                        }, 1200);
+                        });
                         },
-                        error: function(err) {
-                            alert('Error al registrar la venta: ' + (err.responseJSON?.message || 'Verifique los datos o el stock disponible.'));
-                        }
-                    });
+                        'Sí, procesar venta'
+                    );
                 });
     </script>
 }

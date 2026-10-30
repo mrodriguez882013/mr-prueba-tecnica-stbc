@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Error del Sistema";
+}
+
+<div class="container text-center mt-5">
+    <div class="card shadow border-0 p-5 mx-auto" style="max-width: 600px; border-top: 5px solid #b30000 !important;">
+        <div class="card-body">
+            <div class="text-danger display-1 mb-3">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h2 class="fw-bold text-dark">¡Ocurrió un inconveniente!</h2>
+            <p class="text-secondary mt-2">
+                Lo sentimos, el servidor experimentó un problema al procesar su solicitud o la comunicación con la API falló temporalmente.
+            </p>
+            <hr class="my-4">
+            <div class="d-flex justify-content-center gap-2">
+                <a asp-controller="Ventas" asp-action="Index" class="btn btn-danger fw-bold px-4" style="background-color: #b30000; border-color: #b30000;">
+                    <i class="bi bi-house-door-fill me-2"></i>Ir al Inicio
+                </a>
+                <button type="button" class="btn btn-outline-secondary fw-bold px-4" onclick="location.reload();">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

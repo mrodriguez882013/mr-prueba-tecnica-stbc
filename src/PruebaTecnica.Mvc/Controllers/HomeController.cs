@@ -19,11 +19,12 @@ namespace PruebaTecnica.Mvc.Controllers
             return View();
         }
 
-        [HttpGet]
+        // Acción que captura y gestiona los errores no controlados del sistema
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            // Puedes registrar el error en los logs si lo deseas
+            return View();
         }
     }
 }

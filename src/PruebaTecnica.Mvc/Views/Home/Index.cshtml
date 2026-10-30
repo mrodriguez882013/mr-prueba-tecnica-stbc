@@ -14,8 +14,8 @@
             </p>
             <hr class="my-4">
             <p class="text-muted">Utilice las opciones superiores de navegación o el acceso rápido a continuación para comenzar a operar en el sistema.</p>
-            <a class="btn btn-danger btn-lg fw-bold px-4" asp-controller="Ventas" asp-action="Index" style="background-color: #b30000; border-color: #b30000;">
-                Ir a Registro de Ventas &raquo;
+            <a class="btn btn-danger btn-lg fw-bold px-4 text-white" asp-controller="Ventas" asp-action="Index" style="background-color: #b30000; border-color: #b30000;">
+                <i class="bi bi-cart-check-fill me-2"></i>Ir a Registro de Ventas &raquo;
             </a>
         </div>
     </div>
@@ -27,14 +27,16 @@
         <div class="col-md-@(rol == "Administrador" ? "6" : "12")">
             <div class="h-100 p-4 bg-white border rounded-3 shadow-sm">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="fs-1 me-3 text-danger">🛒</div>
+                    <div class="fs-1 me-3 text-danger"><i class="bi bi-cart-fill"></i></div>
                     <div>
                         <h2 class="fw-bold h4 mb-0">Módulo de Ventas</h2>
                         <small class="text-muted">Registro y cálculo en tiempo real</small>
                     </div>
                 </div>
                 <p class="text-secondary">Realice facturación de productos por código, aplique cálculos automáticos de IVA (13%), subtotal y total a pagar de manera rápida y eficiente.</p>
-                <a class="btn btn-outline-danger fw-bold" asp-controller="Ventas" asp-action="Index">Acceder a Ventas</a>
+                <a class="btn btn-outline-danger fw-bold" asp-controller="Ventas" asp-action="Index">
+                    <i class="bi bi-arrow-right-circle me-1"></i>Acceder a Ventas
+                </a>
             </div>
         </div>
 
@@ -44,14 +46,16 @@
             <div class="col-md-6">
                 <div class="h-100 p-4 bg-white border rounded-3 shadow-sm">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="fs-1 me-3 text-danger">📦</div>
+                        <div class="fs-1 me-3 text-danger"><i class="bi bi-box-seam"></i></div>
                         <div>
                             <h2 class="fw-bold h4 mb-0">Gestión de Productos</h2>
                             <small class="text-muted">Mantenimiento de inventario</small>
                         </div>
                     </div>
                     <p class="text-secondary">Administre el catálogo de productos disponibles, revise existencias en stock, precios actualizados y supervise las altas de nuevos artículos en el sistema.</p>
-                    <a class="btn btn-outline-danger fw-bold" asp-controller="Productos" asp-action="Index">Acceder a Productos</a>
+                    <a class="btn btn-outline-danger fw-bold" asp-controller="Productos" asp-action="Index">
+                        <i class="bi bi-arrow-right-circle me-1"></i>Acceder a Productos
+                    </a>
                 </div>
             </div>
 
@@ -59,14 +63,16 @@
             <div class="col-md-12 mt-2">
                 <div class="h-100 p-4 bg-white border rounded-3 shadow-sm border-top border-warning border-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="fs-1 me-3 text-warning">📊</div>
+                        <div class="fs-1 me-3 text-warning"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
                         <div>
                             <h2 class="fw-bold h4 mb-0">Reportes Corporativos de Ventas</h2>
                             <small class="text-muted">Panel de control gerencial</small>
                         </div>
                     </div>
                     <p class="text-secondary">Consulte el historial completo de transacciones realizadas por los operadores, filtre por rangos de fecha y analice el volumen de ventas global de la institución.</p>
-                    <a class="btn btn-dark fw-bold px-4" asp-controller="Ventas" asp-action="Reporte">Ver Reportes de Ventas</a>
+                    <a class="btn btn-dark fw-bold px-4" asp-controller="Ventas" asp-action="Reporte">
+                        <i class="bi bi-graph-up-arrow me-1"></i>Ver Reportes de Ventas
+                    </a>
                 </div>
             </div>
         }

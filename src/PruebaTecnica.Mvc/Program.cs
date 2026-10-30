@@ -2,24 +2,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ---------------------------------------------------------------------
 // 1. CONFIGURACIÓN DE SERVICIOS BÁSICOS Y CONTROLLERS
-// Agrega soporte para los controladores y vistas del patrón MVC
 // ---------------------------------------------------------------------
 builder.Services.AddControllersWithViews();
 
-
 // ---------------------------------------------------------------------
 // 2. CONFIGURACIÓN DEL CLIENTE HTTP PARA CONSUMIR LA API REST
-// Registra HttpClient con la URL base de tu API para inyectarlo en los controladores
 // ---------------------------------------------------------------------
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7094/"); // Ajusta el puerto según tu API
+    // Ajusta el puerto exacto en el que corre tu Web API
+    client.BaseAddress = new Uri("https://localhost:7094/");
 });
-
 
 // ---------------------------------------------------------------------
 // 3. CONFIGURACIÓN DE SESIONES PARA CONTROL DE ROLES Y USUARIO
-// Habilita el almacenamiento de sesión para persistir el login, rol y usuario actual
 // ---------------------------------------------------------------------
 builder.Services.AddSession(options =>
 {
@@ -28,18 +24,25 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
 var app = builder.Build();
 
 // ---------------------------------------------------------------------
 // 4. CONFIGURACIÓN DEL PIPELINE DE PETICIONES HTTP (MIDDLEWARES)
-// Configuración de manejo de excepciones para entornos de producción
 // ---------------------------------------------------------------------
 if (!app.Environment.IsDevelopment())
 {
+    // Redirige a la vista de error amigable en producción
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+else
+{
+    // Muestra errores detallados únicamente en entorno de desarrollo local
+    app.UseDeveloperExceptionPage();
+}
+
+// Redirige códigos de estado HTTP (como 404 o 400 no controlados) al manejador de errores
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -48,7 +51,7 @@ app.UseRouting();
 
 // ---------------------------------------------------------------------
 // 5. ACTIVACIÓN DE SESIÓN Y SEGURIDAD
-// El middleware de sesión debe ir obligatoriamente antes de UseAuthorization y MapControllerRoute
+// ¡OBLIGATORIO! UseSession debe ir estrictamente antes de UseAuthorization
 // ---------------------------------------------------------------------
 app.UseSession();
 
@@ -58,7 +61,7 @@ app.MapStaticAssets();
 
 // ---------------------------------------------------------------------
 // 6. CONFIGURACIÓN DE RUTAS POR DEFECTO
-// Redirige la ruta inicial directamente al controlador de Autenticación (Login)
+// Inicia directamente en el módulo de Autenticación (Login)
 // ---------------------------------------------------------------------
 app.MapControllerRoute(
     name: "default",

@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="card shadow border-0">
         <!-- Encabezado rojo corporativo con el botón de Nuevo Producto a la par -->
-        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center" style="background-color: #b30000 !important;">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Gestión de Productos</h5>
             <button type="button" class="btn btn-light btn-sm fw-bold text-danger" onclick="abrirModalCrear()">
                 + Nuevo Producto
@@ -36,14 +36,14 @@
                                 <td>@prod.Producto</td>
                                 <td>$@prod.Precio.ToString("0.00")</td>
                                 <td>@prod.Stock</td>
-                                <td class="text-center">
+                                <td class="text-center text-nowrap">
                                     <!-- Botón Editar -->
                                     <button class="btn btn-outline-danger btn-sm" onclick="abrirModalEditar(@prod.IdPro, '@prod.Codigo', '@prod.Producto', @prod.Precio, @prod.Stock)" title="Editar">
-                                        Editar
+                                       <i class="bi bi-pencil-square"></i> Editar
                                     </button>
                                     <!-- Botón Eliminar original con su estilo de borde rojo -->
                                     <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto(@prod.IdPro)">
-                                        Eliminar
+                                        <i class="bi bi-trash-fill"></i> Eliminar
                                     </button>
                                 </td>
                             </tr>
@@ -120,6 +120,7 @@
             $('#modalProducto').modal('show');
         }
 
+        // Guardar o Editar Producto
         function guardarProducto() {
             let id = $('#txtIdPro').val();
             let data = {
@@ -130,37 +131,33 @@
                 idUsuarioCreacion: 1
             };
 
+            if (!data.codigo || !data.producto || isNaN(data.precio) || isNaN(data.stock)) {
+                Utilidades.mostrarNotificacion('Por favor complete todos los campos obligatorios.', 'Atención', 'warning');
+                return;
+            }
+
             let url = id == "0" ? '/Productos/Crear' : `/Productos/Actualizar/${id}`;
             let metodo = id == "0" ? 'POST' : 'PUT';
+            let mensaje = id == " 0" ? 'Producto creado exitosamente' : 'Producto actualizado correctamente';
 
-            $.ajax({
-                url: url,
-                type: metodo,
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function(res) {
-                    $('#modalProducto').modal('hide');
-                    location.reload();
-                },
-                error: function(err) {
-                    alert('Error al guardar el producto.');
-                }
-            });
+            Utilidades.ejecutarAjax(url, metodo, data, function (res) {
+                $('#modalProducto').modal('hide');
+                location.reload();
+            }, mensaje);
         }
 
+        // Eliminar Producto con Confirmación SweetAlert2
         function eliminarProducto(id) {
-            if (confirm('¿Está seguro de que desea eliminar este registro?')) {
-                $.ajax({
-                    url: `/Productos/Eliminar/${id}`,
-                    type: 'DELETE',
-                    success: function(res) {
+            Utilidades.confirmarAccion(
+                '¿Desea eliminar este producto?',
+                'Esta acción no se puede deshacer.',
+                function () {
+                    Utilidades.ejecutarAjax(`/Productos/Eliminar/${id}`, 'DELETE', null, function () {
                         location.reload();
-                    },
-                    error: function(err) {
-                        alert('No se pudo eliminar el producto.');
-                    }
-                });
-            }
+                    }, 'Producto eliminado con éxito');
+                },
+                'Sí, eliminar'
+            );
         }
     </script>
 }

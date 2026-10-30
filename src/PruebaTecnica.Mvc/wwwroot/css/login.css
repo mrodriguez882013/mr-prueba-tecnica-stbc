@@ -1,0 +1,40 @@
+﻿
+/*------------------------
+ Login Page
+------------------------*/
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*------------------------
+ Login Card
+------------------------*/
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.15);
+}
+
+/*------------------------
+ Logo
+------------------------*/
+.login-logo {
+    height: 55px;
+    width: auto;
+    margin-bottom: 15px;
+}
+
+/*------------------------
+ Title
+------------------------*/
+.login-title {
+    color: #c8102f;
+    font-weight: 700;
+    margin-bottom: 5px;
+}

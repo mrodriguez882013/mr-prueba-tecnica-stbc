@@ -62,15 +62,36 @@ namespace PruebaTecnica.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> Reporte(DateTime? fechaInicio, DateTime? fechaFin)
         {
-            if (HttpContext.Session.GetString("UserRol") != "Administrador")
-                return RedirectToAction("Index");
+            try
+            {
+                // Validación previa opcional para evitar enviar rangos incongruentes a la API
+                if (fechaInicio.HasValue && fechaFin.HasValue && fechaFin.Value < fechaInicio.Value)
+                {
+                    TempData["ErrorMessage"] = "La fecha fin no puede ser anterior a la fecha de inicio.";
+                    return View(new List<VentaReporteResponse>());
+                }
 
-            string query = $"api/ventas/reporte?";
-            if (fechaInicio.HasValue) query += $"fechaInicio={fechaInicio:yyyy-MM-dd}&";
-            if (fechaFin.HasValue) query += $"fechaFin={fechaFin:yyyy-MM-dd}";
+                string url = $"api/ventas/reporte?fechaInicio={fechaInicio?.ToString("yyyy-MM-dd")}&fechaFin={fechaFin?.ToString("yyyy-MM-dd")}";
 
-            var reporte = await _httpClient.GetFromJsonAsync<IEnumerable<VentaReporteResponse>>(query);
-            return View(reporte ?? []);
+                // Usamos GetAsync para evaluar el código de estado sin lanzar excepciones automáticas
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Si la API responde con 400 Bad Request u otro error, capturamos el flujo
+                    TempData["ErrorMessage"] = "La API rechazó la solicitud. Verifique que el rango de fechas sea válido.";
+                    return View(new List<VentaReporteResponse>());
+                }
+
+                var reporte = await response.Content.ReadFromJsonAsync<IEnumerable<VentaReporteResponse>>();
+                return View(reporte ?? new List<VentaReporteResponse>());
+            }
+            catch (Exception ex)
+            {
+                // Captura cualquier caída de red o error inesperado evitando la pantalla de depuración
+                TempData["ErrorMessage"] = "Error de conexión al intentar obtener el reporte corporativo.";
+                return View(new List<VentaReporteResponse>());
+            }
         }
 
         [HttpGet]

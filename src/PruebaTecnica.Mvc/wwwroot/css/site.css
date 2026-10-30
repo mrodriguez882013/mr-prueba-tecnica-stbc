@@ -29,3 +29,16 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+
+.app-logo {
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+}
+
+/* Eliminar transparencia de las notificaciones Toastr */
+#toast-container > .toast {
+    opacity: 1 !important;
+}
