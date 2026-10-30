@@ -66,8 +66,16 @@ namespace PruebaTecnica.Mvc.Controllers
         {
             if (!EsAdmin()) return Unauthorized();
 
-            await _httpClient.DeleteAsync($"api/productos/{id}");
-            return RedirectToAction(nameof(Index));
+            // Envía la petición DELETE hacia la API de productos
+            var response = await _httpClient.DeleteAsync($"api/productos/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Retornamos OK para que AJAX detecte el éxito y recargue la tabla
+                return Ok(new { success = true });
+            }
+
+            return BadRequest("No se pudo eliminar el producto en la API.");
         }
     }
 }
