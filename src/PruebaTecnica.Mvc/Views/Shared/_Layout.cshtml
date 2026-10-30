@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sistema BAC</title>
 
-    <!-- Css gloables -->
+    <!-- Encabezados para evitar que el botón atrás recupere la página en caché -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Css globales -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 
@@ -20,19 +25,28 @@
 
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-    
+
+    <style>
+        /* Estilo visual para destacar la opción activa del menú */
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-danger border-bottom box-shadow mb-3 py-3" style="background-color: #b30000 !important;">
             <div class="container-fluid px-4">
-                <!-- Marca / Título principal de la aplicación -->
+                <!-- Marca / Logotipo original de BAC -->
                 <a class="navbar-brand d-flex align-items-center text-white me-4"
                    asp-controller="Home"
                    asp-action="Index">
                     <img src="~/images/Bac_Credomatic_logo.png"
                          alt="BAC"
-                         class="app-logo" />
+                         class="app-logo" style="max-height: 35px;" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +54,7 @@
                 </button>
                 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <!-- Menú de navegación principal con las opciones exactas de la prueba -->
+                    <!-- Menú de navegación principal con las cuatro opciones -->
                     <ul class="navbar-nav flex-grow-1 align-items-center">
                         <li class="nav-item me-2">
                             <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
@@ -53,7 +67,7 @@
                                 <a class="nav-link text-white" asp-controller="Productos" asp-action="Index">Productos</a>
                             </li>
                             <li class="nav-item me-2">
-                                <a class="nav-link text-white active" asp-controller="Ventas" asp-action="Index">Ventas</a>
+                                <a class="nav-link text-white" asp-controller="Ventas" asp-action="Index">Ventas</a>
                             </li>
                             <li class="nav-item me-2">
                                 <a class="nav-link text-white" asp-controller="Ventas" asp-action="Reporte">Reportes</a>
@@ -63,7 +77,7 @@
                         {
                             <!-- Si es Operador, ve Ventas directamente -->
                             <li class="nav-item me-2">
-                                <a class="nav-link text-white active" asp-controller="Ventas" asp-action="Index">Ventas</a>
+                                <a class="nav-link text-white" asp-controller="Ventas" asp-action="Index">Ventas</a>
                             </li>
                         }
                     </ul>
@@ -73,7 +87,7 @@
                         @if (Context.Session.GetString("UserName") != null)
                         {
                             <li class="nav-item me-3">
-                                <!-- Nombre de usuario/rol en color amarillo tal como en la prueba -->
+                                <!-- Nombre de usuario/rol en color amarillo -->
                                 <span class="nav-link text-warning fw-bold p-0">@(Context.Session.GetString("UserName")!.ToUpper())</span>
                             </li>
                             <li class="nav-item">
@@ -94,23 +108,36 @@
         </main>
     </div>
 
-    <!-- js globales -->
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery (necesario para Toastr) -->
+    <!-- JS globales -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Script con Funciones Genéricas (site.js) -->
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Script para marcar resaltado el menú seleccionado automáticamente -->
+    <script>
+        $(document).ready(function () {
+            var path = window.location.pathname.toLowerCase();
+
+            $('.navbar-nav .nav-link').each(function () {
+                var href = $(this).attr('href');
+                if (href) {
+                    href = href.toLowerCase();
+                    if (path === href || (path !== '/' && href !== '/' && path.startsWith(href))) {
+                        $(this).addClass('active fw-bold');
+                    }
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

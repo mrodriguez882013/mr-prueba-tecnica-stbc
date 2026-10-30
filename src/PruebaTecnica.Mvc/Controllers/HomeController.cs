@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PruebaTecnica.Mvc.Models;
-using PruebaTecnica.Mvc.Models.ViewModels;
-using System.Diagnostics;
 
 namespace PruebaTecnica.Mvc.Controllers
 {
@@ -10,6 +7,12 @@ namespace PruebaTecnica.Mvc.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            // Si la sesión del usuario ya no existe, redirigir al login inmediatamente
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             return View();
         }
 

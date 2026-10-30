@@ -4,6 +4,17 @@ Proyecto desarrollado como **Prueba Técnica**, estructurado en una arquitectura
 
 El sistema permite administrar el inventario de productos, la gestión del punto de venta con cálculo de montos e IVA (13%) en tiempo real, control de acceso basado en roles de usuario (*Administrador* y *Operador*), auditoría de transacciones y generación de reportes corporativos en Excel y PDF, interactuando con **Microsoft SQL Server** mediante **Procedimientos Almacenados (Stored Procedures)** y **Table-Valued Parameters (TVP)**.
 
+### 🔑 Credenciales de Prueba por Defecto
+El sistema cuenta con dos perfiles preconfigurados en la base de datos para validar las restricciones de roles y los accesos mediante autenticación con hash (BCrypt)[cite: 2]:
+
+* **Administrador:**
+  * **Usuario:** `admin`
+  * **Contraseña:** `admin`
+
+* **Operador:**
+  * **Usuario:** `operador`
+  * **Contraseña:** `operador` *(La clave es la misma para ambos perfiles, facilitando las pruebas de ambos roles de forma sencilla)
+
 ## 🚀 Características Principales
 
 ### Requerimientos Funcionales

@@ -44,8 +44,17 @@ namespace PruebaTecnica.Mvc.Controllers
         [HttpPost]
         public IActionResult Logout()
         {
+            // 1. Limpiar las variables de sesión
             HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+
+            // 2. Destruir la cookie de sesión del navegador
+            if (Request.Cookies[".AspNetCore.Session"] != null)
+            {
+                Response.Cookies.Delete(".AspNetCore.Session");
+            }
+
+            // 3. Redirigir al Login
+            return RedirectToAction("Login", "Account");
         }
     }
 }
