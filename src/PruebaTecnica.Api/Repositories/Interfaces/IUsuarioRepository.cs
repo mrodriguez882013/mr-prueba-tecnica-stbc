@@ -4,7 +4,11 @@ namespace PruebaTecnica.Api.Repositories.Interfaces
 {
     public interface IUsuarioRepository
     {
-        Task<Usuario?> ObtenerPorUsernameAsync(string username);
-        Task<Usuario?> ObtenerPorIdAsync(int idUsuario);
+        Task<Usuario?> ObtenerPorUsernameAsync(
+            string username, 
+            CancellationToken cancellationToken = default);
+        Task<Usuario?> ObtenerPorIdAsync(
+            int idUsuario,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -14,15 +14,23 @@ public class UsuarioRepository : IUsuarioRepository
         _context = context;
     }
 
-    public async Task<Usuario?> ObtenerPorUsernameAsync(string username)
+    //---------------------------
+    // Lecturas
+    //---------------------------
+
+    public async Task<Usuario?> ObtenerPorUsernameAsync(
+        string username, 
+        CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Username == username);
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken: cancellationToken);
     }
 
-    public async Task<Usuario?> ObtenerPorIdAsync(int idUsuario)
+    public async Task<Usuario?> ObtenerPorIdAsync(
+        int idUsuario,
+        CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios
-            .FindAsync(idUsuario);
+            .FindAsync([idUsuario], cancellationToken: cancellationToken);
     }
 }

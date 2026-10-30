@@ -19,19 +19,23 @@ public class ProductoRepository : IProductoRepository
     // Lecturas
     //------------------
 
-    public async Task<IEnumerable<Producto>> ObtenerProductosAsync(string? codigo)
+    public async Task<IEnumerable<Producto>> ObtenerProductosAsync(
+        string? codigo,
+        CancellationToken cancellationToken = default)
     {
         var pCodigo = new SqlParameter("@codigo", (object?)codigo ?? DBNull.Value);
         return await _context.Productos
             .FromSqlRaw("EXEC dbo.UspObtenerProductos @codigo", pCodigo)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
     //-------------------
     // Escrituras
     //-------------------
 
-    public async Task InsertarProductoAsync(Producto producto)
+    public async Task InsertarProductoAsync(
+      Producto producto,
+      CancellationToken cancellationToken = default)
     {
         var pCodigo = new SqlParameter("@codigo", producto.Codigo);
         var pProducto = new SqlParameter("@producto", producto.ProductoNombre);
@@ -40,11 +44,16 @@ public class ProductoRepository : IProductoRepository
         var pUser = new SqlParameter("@idUsuarioCreacion", producto.IdUsuarioCreacion);
 
         await _context.Database.ExecuteSqlRawAsync(
-            "EXEC dbo.UspInsertarProducto @codigo, @producto, @precio, @stock, @idUsuarioCreacion",
-            pCodigo, pProducto, pPrecio, pStock, pUser);
+            sql: "EXEC dbo.UspInsertarProducto @codigo, @producto, @precio, @stock, @idUsuarioCreacion",
+            parameters: [pCodigo, pProducto, pPrecio, pStock, pUser],
+            cancellationToken: cancellationToken
+        );
     }
 
-    public async Task ActualizarProductoAsync(int id, Producto producto)
+    public async Task ActualizarProductoAsync(
+       int id,
+       Producto producto,
+       CancellationToken cancellationToken = default)
     {
         var pId = new SqlParameter("@idpro", id);
         var pCodigo = new SqlParameter("@codigo", producto.Codigo);
@@ -53,13 +62,23 @@ public class ProductoRepository : IProductoRepository
         var pStock = new SqlParameter("@stock", producto.Stock);
 
         await _context.Database.ExecuteSqlRawAsync(
-            "EXEC dbo.UspActualizarProducto @idpro, @codigo, @producto, @precio, @stock",
-            pId, pCodigo, pProducto, pPrecio, pStock);
+            sql: "EXEC dbo.UspActualizarProducto @idpro, @codigo, @producto, @precio, @stock",
+            parameters: [pId, pCodigo, pProducto, pPrecio, pStock],
+            cancellationToken: cancellationToken
+        );
     }
 
-    public async Task EliminarProductoAsync(int id)
+    public async Task EliminarProductoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
     {
         var pId = new SqlParameter("@idpro", id);
-        await _context.Database.ExecuteSqlRawAsync("EXEC dbo.UspEliminarProducto @idpro", pId);
+
+        await _context.Database.ExecuteSqlRawAsync(
+            sql: "EXEC dbo.UspEliminarProducto @idpro",
+            parameters: [pId],
+            cancellationToken: cancellationToken
+        );
     }
+
 }
