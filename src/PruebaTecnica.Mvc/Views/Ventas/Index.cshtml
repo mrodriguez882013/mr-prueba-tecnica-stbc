@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Registro de Ventas";
+    var vendedor = ViewBag.Vendedor as string;
+    var idUsuario = ViewBag.IdUsuario;
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Registro de ventas</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Codigo:</label>
+                    <input type="text" id="txtCodigo" class="form-control" placeholder="Ej. 001 (Presione Tab o salga)" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Producto:</label>
+                    <input type="text" id="txtProducto" class="form-control bg-light" readonly />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Precio:</label>
+                    <input type="number" id="txtPrecio" class="form-control bg-light" readonly />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Cantidad:</label>
+                    <input type="number" id="txtCantidad" class="form-control" value="1" min="1" />
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="btnAgregar" class="btn btn-danger w-100">+ agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border mb-4">
+        <div class="card-body">
+            <h6 class="text-secondary mb-3">Detalle de ventas (Vendedor: <span class="fw-bold text-dark" id="lblVendedor">@vendedor</span>)</h6>
+        
+            <table class="table table-bordered align-middle" id="tablaDetalle">
+                <!-- Encabezado con el tono gris exacto de la prueba -->
+                <thead style="background-color: #dcdcdc; color: #000;">
+                    <tr>
+                        <th style="width: 5%;">N°</th>
+                        <th style="width: 15%;">Codigo</th>
+                        <th style="width: 15%;">Fecha</th>
+                        <th style="width: 30%;">Producto</th>
+                        <th style="width: 10%;">Precio</th>
+                        <th style="width: 10%;">Cantidad</th>
+                        <th style="width: 10%;">Total</th>
+                        <th style="width: 5%;" class="text-center">quitar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Contenido dinámico con JavaScript -->
+                </tbody>
+            </table>
+
+            <!-- Totales alineados a la derecha -->
+            <div class="row justify-content-end text-end mt-4">
+                <div class="col-md-4 p-3">
+                    <p class="mb-1">Sub total: <strong id="lblSubTotal">0.00</strong></p>
+                    <p class="mb-2">Total con IVA: <strong id="lblIva">0.00</strong></p>
+                    <h5 class="text-dark mb-3">Total a pagar: <strong id="lblTotalPagar" class="text-danger">0.00</strong></h5>
+                    <button type="button" id="btnRegistrarVenta" class="btn btn-danger btn-lg w-100 fw-bold" style="background-color: #8b0000; border-color: #8b0000;">Registrar venta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let detallesVenta = [];
+        const idUsuario = @idUsuario;
+        const vendedor = "@vendedor";
+
+        // Búsqueda automática de producto al perder el foco (blur) en el código
+        $('#txtCodigo').on('blur', function() {
+            let codigo = $(this).val();
+            if (!codigo) return;
+            
+            // Apunta al método puente en el controlador MVC local
+            $.get(`/Ventas/BuscarProductoPorCodigo?codigo=${codigo}`, function(data) {
+                let prod = Array.isArray(data) ? data[0] : data;
+                if (prod) {
+                    $('#txtProducto').val(prod.producto || prod.productoNombre);
+                    $('#txtPrecio').val(prod.precio);
+                    $('#txtCodigo').data('idpro', prod.idPro || prod.idpro);
+                } else {
+                    alert('Producto no encontrado.');
+                    $('#txtProducto').val('');
+                    $('#txtPrecio').val('');
+                }
+            }).fail(function() {
+                alert('Error al conectar con el servidor para buscar el producto.');
+            });
+        });
+
+        // Agregar producto al detalle de venta con cálculos en pantalla
+        $('#btnAgregar').click(function() {
+            let idPro = $('#txtCodigo').data('idpro');
+            let codigo = $('#txtCodigo').val();
+            let producto = $('#txtProducto').val();
+            let precio = parseFloat($('#txtPrecio').val());
+            let cantidad = parseInt($('#txtCantidad').val());
+
+            if (!idPro || !producto || isNaN(precio)) {
+                alert('Por favor, ingrese un código de producto válido.');
+                return;
+            }
+
+            if (!cantidad || cantidad <= 0) {
+                alert('La cantidad debe ser mayor a cero.');
+                return;
+            }
+
+            let totalLinea = precio * cantidad;
+            let ivaLinea = totalLinea * 0.13; // Cálculo de IVA estándar (13%)
+
+            detallesVenta.push({
+                idPro: idPro,
+                codigo: codigo,
+                productoNombre: producto,
+                precio: precio,
+                cantidad: cantidad,
+                iva: ivaLinea,
+                total: totalLinea
+            });
+
+            renderizarTabla();
+            limpiarCamposProducto();
+        });
+
+        function limpiarCamposProducto() {
+            $('#txtCodigo').val('').removeData('idpro');
+            $('#txtProducto').val('');
+            $('#txtPrecio').val('');
+            $('#txtCantidad').val('1');
+            $('#txtCodigo').focus();
+        }
+
+        function renderizarTabla() {
+            let tbody = $('#tablaDetalle tbody');
+            tbody.empty();
+            let subtotalGral = 0;
+
+            detallesVenta.forEach((item, index) => {
+                subtotalGral += item.total;
+
+               let fechaHoy = new Date().toLocaleString('es-SV', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                        tbody.append(`
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.codigo}</td>
+                                <td>${fechaHoy}</td>
+                                        <td>${item.productoNombre}</td>
+                                <td>$${item.precio.toFixed(2)}</td>
+                                <td>${item.cantidad}</td>
+                                        <td>$${item.total.toFixed(2)}</td>
+                                <td class="text-center"><button class="btn btn-sm btn-outline-danger" onclick="quitarItem(${index})">🗑️</button></td>
+                            </tr>
+                        `);
+            });
+
+            let ivaGral = subtotalGral * 0.13;
+            let totalPagar = subtotalGral + ivaGral;
+
+            $('#lblSubTotal').text('$' + subtotalGral.toFixed(2));
+                    $('#lblIva').text('$' + ivaGral.toFixed(2));
+            $('#lblTotalPagar').text('$' + totalPagar.toFixed(2));
+        }
+
+              window.quitarItem = function(index) {
+                detallesVenta.splice(index, 1);
+            renderizarTabla();
+                }
+
+                // Envío de la venta completa a la API a través del controlador MVC
+            $('#btnRegistrarVenta').click(function() {
+                if (detallesVenta.length === 0) {
+                alert('Debe agregar al menos un producto a la venta.');
+                return;
+                    }
+
+                   let totalGeneral = parseFloat($('#lblTotalPagar').text().replace('$', ''));
+
+                 let payload = {
+                    vendedor: vendedor,
+                total: totalGeneral,
+                idUsuarioCreacion: idUsuario,
+                        detalles: detallesVenta.map(d => ({
+                    idPro: d.idPro,
+                    cantidad: d.cantidad,
+                    precio: d.precio,
+                    iva: d.iva,
+                    total: d.total
+                }))
+                    };
+
+                $.ajax({
+                url: '/Ventas/Registrar',
+                    type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function(res) {
+                        alert('¡Venta registrada con éxito!');
+                            location.reload();
+                        },
+                        error: function(err) {
+                            alert('Error al registrar la venta: ' + (err.responseJSON?.message || 'Verifique los datos o el stock disponible.'));
+                        }
+                    });
+                });
+    </script>
+}

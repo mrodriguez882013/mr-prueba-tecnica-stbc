@@ -1,0 +1,166 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Mantenimiento de Productos - Sistema BAC";
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-0">
+        <!-- Encabezado rojo corporativo con el botón de Nuevo Producto a la par -->
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center" style="background-color: #b30000 !important;">
+            <h5 class="mb-0">Gestión de Productos</h5>
+            <button type="button" class="btn btn-light btn-sm fw-bold text-danger" onclick="abrirModalCrear()">
+                + Nuevo Producto
+            </button>
+        </div>
+        <div class="card-body">
+            <!-- Tabla exactamente con tus clases y diseño original -->
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">ID</th>
+                        <th style="width: 15%;">Código</th>
+                        <th style="width: 40%;">Producto</th>
+                        <th style="width: 12%;">Precio</th>
+                        <th style="width: 10%;">Stock</th>
+                        <th style="width: 13%;" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var prod in Model)
+                        {
+                            <tr>
+                                <td>@prod.IdPro</td>
+                                <td>@prod.Codigo</td>
+                                <td>@prod.Producto</td>
+                                <td>$@prod.Precio.ToString("0.00")</td>
+                                <td>@prod.Stock</td>
+                                <td class="text-center">
+                                    <!-- Botón Editar -->
+                                    <button class="btn btn-outline-danger btn-sm" onclick="abrirModalEditar(@prod.IdPro, '@prod.Codigo', '@prod.Producto', @prod.Precio, @prod.Stock)" title="Editar">
+                                        Editar
+                                    </button>
+                                    <!-- Botón Eliminar original con su estilo de borde rojo -->
+                                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto(@prod.IdPro)">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No hay productos registrados.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear / Editar Producto -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white" style="background-color: #b30000 !important;">
+                <h5 class="modal-title" id="modalTitulo">Nuevo Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formProducto">
+                    <input type="hidden" id="txtIdPro" value="0" />
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Código</label>
+                        <input type="text" class="form-control" id="txtCodigo" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Producto</label>
+                        <input type="text" class="form-control" id="txtNombreProducto" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Precio ($)</label>
+                        <input type="number" step="0.01" class="form-control" id="txtPrecio" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Stock</label>
+                        <input type="number" class="form-control" id="txtStock" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger fw-bold" style="background-color: #b30000; border-color: #b30000;" onclick="guardarProducto()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirModalCrear() {
+            $('#modalTitulo').text('Registrar Nuevo Producto');
+            $('#txtIdPro').val('0');
+            $('#txtCodigo').val('');
+            $('#txtNombreProducto').val('');
+            $('#txtPrecio').val('');
+            $('#txtStock').val('');
+            $('#modalProducto').modal('show');
+        }
+
+        function abrirModalEditar(id, codigo, producto, precio, stock) {
+            $('#modalTitulo').text('Editar Producto');
+            $('#txtIdPro').val(id);
+            $('#txtCodigo').val(codigo);
+            $('#txtNombreProducto').val(producto);
+            $('#txtPrecio').val(precio);
+            $('#txtStock').val(stock);
+            $('#modalProducto').modal('show');
+        }
+
+        function guardarProducto() {
+            let id = $('#txtIdPro').val();
+            let data = {
+                codigo: $('#txtCodigo').val(),
+                producto: $('#txtNombreProducto').val(),
+                precio: parseFloat($('#txtPrecio').val()),
+                stock: parseInt($('#txtStock').val()),
+                idUsuarioCreacion: 1
+            };
+
+            let url = id == "0" ? '/Productos/Crear' : `/Productos/Actualizar/${id}`;
+            let metodo = id == "0" ? 'POST' : 'PUT';
+
+            $.ajax({
+                url: url,
+                type: metodo,
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(res) {
+                    $('#modalProducto').modal('hide');
+                    location.reload();
+                },
+                error: function(err) {
+                    alert('Error al guardar el producto.');
+                }
+            });
+        }
+
+        function eliminarProducto(id) {
+            if (confirm('¿Está seguro de que desea eliminar este registro?')) {
+                $.ajax({
+                    url: `/Productos/Eliminar/${id}`,
+                    type: 'DELETE',
+                    success: function(res) {
+                        location.reload();
+                    },
+                    error: function(err) {
+                        alert('No se pudo eliminar el producto.');
+                    }
+                });
+            }
+        }
+    </script>
+}

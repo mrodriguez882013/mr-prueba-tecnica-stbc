@@ -1,0 +1,100 @@
+﻿@model IEnumerable<PruebaTecnica.Mvc.Models.Dtos.Ventas.Responses.VentaReporteResponse>
+@{
+    ViewData["Title"] = "Reporte de Ventas";
+}
+
+<div class="container mt-4">
+    <!-- Tarjeta de Filtros -->
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-danger text-white" style="background-color: #b30000 !important;">
+            <h5 class="mb-0">Filtrar Reporte de Ventas</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Reporte" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Fecha Inicio</label>
+                    <input type="date" name="fechaInicio" class="form-control" value="@Context.Request.Query["fechaInicio"]" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fecha Fin</label>
+                    <input type="date" name="fechaFin" class="form-control" value="@Context.Request.Query["fechaFin"]" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-danger w-100 fw-bold" style="background-color: #b30000; border-color: #b30000;">Filtrar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Opciones de Exportación Corporativa -->
+    <div class="card shadow-sm border mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center py-3">
+            <div>
+                <h6 class="text-dark mb-1 fw-bold">Opciones de Exportación</h6>
+                <p class="text-muted small mb-0">Descargue el reporte actual en formato digital.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <!-- Botón Exportar a Excel -->
+                <a asp-action="ExportarExcel"
+                   asp-route-fechaInicio="@Context.Request.Query["fechaInicio"]"
+                   asp-route-fechaFin="@Context.Request.Query["fechaFin"]"
+                   class="btn btn-success fw-bold px-3">
+                    📥 Exportar a Excel
+                </a>
+
+                <!-- Botón Exportar a PDF (Color corporativo #b30000) -->
+                <a asp-action="ExportarPdf"
+                   asp-route-fechaInicio="@Context.Request.Query["fechaInicio"]"
+                   asp-route-fechaFin="@Context.Request.Query["fechaFin"]"
+                   class="btn btn-danger fw-bold px-3"
+                   style="background-color: #b30000; border-color: #b30000;">
+                    📥 Exportar a PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Resultados -->
+    <div class="card shadow border-0">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Resultados del Reporte</h5>
+            <table class="table table-bordered align-middle">
+                <!-- Encabezado con el tono gris exacto de la prueba (#dcdcdc) -->
+                <thead style="background-color: #dcdcdc; color: #000;">
+                    <tr>
+                        <th style="width: 10%;">ID Venta</th>
+                        <th style="width: 18%;">Fecha</th>
+                        <th style="width: 20%;">Vendedor</th>
+                        <th style="width: 22%;">Producto</th>
+                        <th style="width: 10%;" class="text-center">Cantidad</th>
+                        <th style="width: 10%;">P. Unitario</th>
+                        <th style="width: 10%;">Total Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.IdVenta</td>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                <td>@item.Vendedor</td>
+                                <td>@item.NombreProducto (@item.CodigoProducto)</td>
+                                <td class="text-center">@item.Cantidad</td>
+                                <td>$@item.PrecioUnitario.ToString("0.00")</td>
+                                <td><strong>$@item.TotalDetalle.ToString("0.00")</strong></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">No se encontraron registros en el rango seleccionado.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
